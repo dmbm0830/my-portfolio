@@ -4,6 +4,20 @@
   width: 650px;
 }
 
-#greeting-container {
+#fact-container {
   margin-top: 20px;
+}
+
+.image-thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.shadow-on-text-red {
+    text-shadow: 2px 2px 5px red;
+}
+
+.shadow-on-text-green {
+    text-shadow: 2px 2px 5px green;
 }
