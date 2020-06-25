@@ -2,17 +2,31 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>My Portfolio</title>
+    <title>Dwight's Google Portfolio</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+    <style>
+        body {
+            background-image: url(images/background1.jpg);
+        }
+    </style>
   </head>
   <body>
     <div id="content">
-      <h1>My Portfolio</h1>
-      <p>This is my portfolio.</p>
-      <p>Click here to get a random message:</p>
-      <button onclick="addRandomGreeting()">Hello</button>
-      <div id="greeting-container"></div>
+      <h1 class="shadow-on-text-red">Dwight's Google Portfolio</h1>
+      <p>I am a rising junior currently attending Stanford University. I am
+          studying Computer Science as my major, while minoring in Mathematics. 
+          This summer, I am working at Google while at home with my family in Memphis, 
+          Tennessee. For fun, I enjoy playing tennis, playing video and board games with friends, 
+          and going to the gym. I have always been a big fan of the Memphis Grizzlies, and follow the
+          NBA pretty closely as well. As far as video games that I play frequently, I play 
+          a lot of Overwatch, and recently started getting into SMITE. 
+      </p>
+      <p><a href="https://www.linkedin.com/in/dwight-moore-jr-295074193/">This</a> sends you to my LinkedIn profile! Check it out!</p>
+      <p>Click here to generate a random fact about me!</p>
+      <button onclick="addRandomFact()">New Fact</button>
+      <div id="fact-container"></div>
+      <p>If you want to learn more about me, click <a href="images.html">here</a>!</p>
     </div>
   </body>
 </html>
