@@ -28,3 +28,12 @@ function addRandomFact() {
   const factContainer = document.getElementById('fact-container');
   factContainer.innerText = fact;
 }
+
+/**
+ * Adds a message from the server to the page.
+ */
+function addServerMessage() {
+  fetch('/data').then(response => response.text()).then((message) => {
+    document.getElementById('message-container').innerText = message;
+  });
+}
