@@ -28,13 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-    private final ArrayList<String> messageList = new ArrayList<String>(){
-        {
-            add("Hello there!");
-            add("This is a provided message!");
-            add("I bet you did not se the typo in this message...");
-        }
-    };
+  private final ArrayList<String> messageList = new ArrayList<String>(){
+    {
+      add("Hello there!");
+      add("This is a provided message!");
+      add("I bet you did not se the typo in this message...");
+    }
+  };
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
