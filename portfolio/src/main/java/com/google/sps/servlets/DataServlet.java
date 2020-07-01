@@ -14,6 +14,13 @@
 
 package com.google.sps.servlets;
 
+
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -28,11 +35,21 @@ import javax.servlet.http.HttpServletResponse;
 /** Servlet that returns some example content. TODO: modify this file to handle comments data */
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
-  private final ArrayList<String> messageList = new ArrayList<String>();
 
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
+
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(query);
+    ArrayList<String> messageList = new ArrayList<String>();
+
+    for (Entity entity : results.asIterable()) {
+      String message = (String) entity.getProperty("message");
+      messageList.add(message);
+    }
+
     String json = convertToJsonUsingGson(messageList);
     response.setContentType("application/json;");
     response.getWriter().println(json);
@@ -42,8 +59,15 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // If the user sends another POST request after the game is over, then start a new game.
     String message = getRequestMessage(request);
+    long timestamp = System.currentTimeMillis();
+
     if (message != null && !message.isEmpty()){
-      messageList.add(message);
+      Entity commentEntity = new Entity("Comment");
+      commentEntity.setProperty("message", message);
+      commentEntity.setProperty("timestamp", timestamp);
+
+      DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+      datastore.put(commentEntity);
     }
 
     // Redirect back to the HTML page.
