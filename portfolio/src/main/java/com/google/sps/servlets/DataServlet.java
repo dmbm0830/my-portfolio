@@ -22,6 +22,8 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -60,10 +62,21 @@ public class DataServlet extends HttpServlet {
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String message = getRequestMessage(request);
     long timestamp = System.currentTimeMillis();
+    UserService userService = UserServiceFactory.getUserService();
+
+    /* If user is not logged in, then no comment is added. Instead, the user
+     * is sent to a login screen.
+     */
+    if (!userService.isUserLoggedIn()) {
+        response.sendRedirect("/login");
+        return;
+    }
 
     if (message != null && !message.isEmpty()){
       Entity commentEntity = new Entity("Comment");
+      String email = userService.getCurrentUser().getEmail();
       commentEntity.setProperty("message", message);
+      commentEntity.setProperty("email", email);
       commentEntity.setProperty("timestamp", timestamp);
 
       DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
