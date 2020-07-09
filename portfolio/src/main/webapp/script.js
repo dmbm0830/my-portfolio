@@ -37,3 +37,12 @@ function addServerMessage() {
     document.getElementById('message-container').innerText = message;
   });
 }
+
+/**
+ * Adds the comments if the user is logged in. Otherwise, prompts a login.
+ */
+function checkLoginStatus(){
+  fetch('/login').then(response => response.text()).then((message) => {
+    document.getElementById('message-container').innerHTML = message;
+  });
+}
