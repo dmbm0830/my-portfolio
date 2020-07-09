@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/** Servlet that displays login and logout information, and prints out comments if logged in */
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -23,6 +24,7 @@ public class LoginServlet extends HttpServlet {
     response.setContentType("text/html");
     PrintWriter out = response.getWriter();
 
+    /** Prints out all comments with email of commenter only if user is logged in */
     UserService userService = UserServiceFactory.getUserService();
     if (userService.isUserLoggedIn()) {
       out.println("<ul>");
@@ -39,6 +41,7 @@ public class LoginServlet extends HttpServlet {
       String logoutUrl = userService.createLogoutURL("/index.html");
       response.getWriter().println("<p>Logout <a href=\"" + logoutUrl + "\">here</a>.</p>");
     } else {
+      /** Otherwise, the user is prompted to login */
       String loginUrl = userService.createLoginURL("/index.html");
       response.getWriter().println("<p>Login <a href=\"" + loginUrl + "\">here</a>.</p>");
     }
