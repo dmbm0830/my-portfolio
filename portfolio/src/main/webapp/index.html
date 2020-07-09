@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Dwight's Google Portfolio</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB1M_xBZiQU1tVyrMjm12l8ABs6ZDNcaT4"></script>
     <script src="script.js"></script>
     <style>
         body {
@@ -11,7 +12,7 @@
         }
     </style>
   </head>
-  <body>
+  <body onload="createMap()">
     <div id="content">
       <h1 class="shadow-on-text-red">Dwight's Google Portfolio</h1>
       <p>I am a rising junior currently attending Stanford University. I am
@@ -45,5 +46,6 @@
       <input type="submit" value="Delete all comments" />
       </form>
     </div>
+    <div id="map"></div>
   </body>
 </html>

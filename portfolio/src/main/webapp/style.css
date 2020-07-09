@@ -8,6 +8,14 @@
   margin-top: 20px;
 }
 
+#map {
+  border: thin solid black;  
+  margin-left: auto;
+  margin-right: auto;
+  height: 700px;
+  width: 800px;
+}
+
 .image-thumbnails {
   display: flex;
   flex-wrap: wrap;
