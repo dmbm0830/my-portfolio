@@ -22,6 +22,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class FindMeetingQuery {
+  /**
+   * Returns a list of times in which a requested meeting can be held.
+   */
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     Collection<String> reqAttendees = request.getAttendees();
     Collection<String> allAttendees = new HashSet<String>(){{
@@ -34,7 +37,11 @@ public final class FindMeetingQuery {
     }
     return finalTimes;
   }
-
+  
+  /**
+   * Returns a list of times for a requested meeting based on the attendees that are required to 
+   * attend. 
+   */
   private ArrayList<TimeRange> determineFreeTimes(Collection<String> attendees, Collection<Event> events, MeetingRequest request){
     ArrayList<TimeRange> timesToWorkAround = new ArrayList<TimeRange>();
     // Only need to work around preexisting events that must be attended by at least one other attendee.
@@ -49,7 +56,11 @@ public final class FindMeetingQuery {
     ArrayList<TimeRange> finalTimes = getFreeTimes(mergedTimes, request.getDuration());
     return finalTimes;
   }
-
+  
+  /**
+   * Determines if a given meeting is required to be attended by at least one attendee of the
+   * meeting request.
+   */
   private boolean isRequiredMeeting(Event event, Collection<String> reqAttendees){
       Set<String> attendees = event.getAttendees();
       Set<String> reqAsSet = new HashSet<String>(reqAttendees);
@@ -59,6 +70,10 @@ public final class FindMeetingQuery {
       return !reqAsSet.isEmpty();
   }
 
+  /**
+   * Given a list of TimeRanges, returns a list in which any overlapping ranges are 
+   * merged into one TimeRange. 
+   */
   private ArrayList<TimeRange> mergeTimes(ArrayList<TimeRange> times){
       ArrayList<TimeRange> mergedTimes = new ArrayList<TimeRange>();
       if (times.isEmpty()){
@@ -82,6 +97,10 @@ public final class FindMeetingQuery {
       return mergedTimes;
   }
 
+  /**
+   * Given a list of non-overlapping TimeRanges representing meetings, returns a list of all 
+   * TimeRanges that are not occupied by meetings and are longer than a specified duration. 
+   */
   private ArrayList<TimeRange> getFreeTimes(ArrayList<TimeRange> mergedTimes, long duration){
       ArrayList<TimeRange> finalTimes = new ArrayList<TimeRange>();
       if (mergedTimes.isEmpty() && duration <= TimeRange.WHOLE_DAY.duration()){
