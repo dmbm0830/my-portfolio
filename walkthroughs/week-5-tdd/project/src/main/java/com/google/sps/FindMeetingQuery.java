@@ -18,14 +18,14 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 public final class FindMeetingQuery {
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     Collection<String> reqAttendees = request.getAttendees();
     Collection<String> allAttendees = new HashSet<String>(){{
-        addAll(request.getAttendees());
+        addAll(reqAttendees);
         addAll(request.getOptionalAttendees());
     }};
     ArrayList<TimeRange> finalTimes = determineFreeTimes(allAttendees, events, request);
