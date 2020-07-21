@@ -14,10 +14,116 @@
 
 package com.google.sps;
 
+import java.lang.Math;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class FindMeetingQuery {
+  /**
+   * Returns a list of times in which a requested meeting can be held.
+   */
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    Collection<String> reqAttendees = request.getAttendees();
+    Collection<String> allAttendees = new HashSet<String>(){{
+        addAll(reqAttendees);
+        addAll(request.getOptionalAttendees());
+    }};
+    ArrayList<TimeRange> finalTimes = determineFreeTimes(allAttendees, events, request);
+    if (finalTimes.isEmpty()){
+        finalTimes = determineFreeTimes(reqAttendees, events, request);
+    }
+    return finalTimes;
+  }
+  
+  /**
+   * Returns a list of times for a requested meeting based on the attendees that are required to 
+   * attend. 
+   */
+  private ArrayList<TimeRange> determineFreeTimes(Collection<String> attendees, Collection<Event> events, MeetingRequest request){
+    ArrayList<TimeRange> timesToWorkAround = new ArrayList<TimeRange>();
+    // Only need to work around preexisting events that must be attended by at least one other attendee.
+    for (Event event : events){
+        if (isRequiredMeeting(event, attendees)){
+            timesToWorkAround.add(event.getWhen());
+        }
+    }
+    Collections.sort(timesToWorkAround, TimeRange.ORDER_BY_START);
+    // Remove all times that overlap one another, and merge those times into larger, unifying TimeRanges.
+    ArrayList<TimeRange> mergedTimes = mergeTimes(timesToWorkAround);
+    ArrayList<TimeRange> finalTimes = getFreeTimes(mergedTimes, request.getDuration());
+    return finalTimes;
+  }
+  
+  /**
+   * Determines if a given meeting is required to be attended by at least one attendee of the
+   * meeting request.
+   */
+  private boolean isRequiredMeeting(Event event, Collection<String> reqAttendees){
+      Set<String> attendees = event.getAttendees();
+      Set<String> reqAsSet = new HashSet<String>(reqAttendees);
+      // If the intersection of the set of mandatory attendees and the event's attendees is empty, then
+      // the meeting is not required. 
+      reqAsSet.retainAll(attendees);
+      return !reqAsSet.isEmpty();
+  }
+
+  /**
+   * Given a list of TimeRanges, returns a list in which any overlapping ranges are 
+   * merged into one TimeRange. 
+   */
+  private ArrayList<TimeRange> mergeTimes(ArrayList<TimeRange> times){
+      ArrayList<TimeRange> mergedTimes = new ArrayList<TimeRange>();
+      if (times.isEmpty()){
+          return mergedTimes;
+      }
+      mergedTimes.add(times.get(0));
+      // For each time, we can compare it to the time before it due to the ordering. Then, we can 
+      // merge the two times into one TimeRange based on the later end time. 
+      for (int i = 1; i < times.size(); i++){
+          TimeRange currTime = times.get(i);
+          int lastIndex = mergedTimes.size() - 1;
+          TimeRange lastTime = mergedTimes.get(lastIndex);
+          if (lastTime.overlaps(currTime) || lastTime.end() == currTime.start()){
+              int laterEnd = Math.max(currTime.end(), lastTime.end());
+              TimeRange newRange = TimeRange.fromStartEnd(lastTime.start(), laterEnd, false);
+              mergedTimes.set(lastIndex, newRange);
+          } else {
+              mergedTimes.add(currTime);
+          }
+      }
+      return mergedTimes;
+  }
+
+  /**
+   * Given a list of non-overlapping TimeRanges representing meetings, returns a list of all 
+   * TimeRanges that are not occupied by meetings and are longer than a specified duration. 
+   */
+  private ArrayList<TimeRange> getFreeTimes(ArrayList<TimeRange> mergedTimes, long duration){
+      ArrayList<TimeRange> finalTimes = new ArrayList<TimeRange>();
+      if (mergedTimes.isEmpty() && duration <= TimeRange.WHOLE_DAY.duration()){
+          finalTimes.add(TimeRange.WHOLE_DAY);
+          return finalTimes;
+      } else {
+          // Only consider the ranges that are NOT occupied by a TimeRange. If a given range is longer than
+          // the duration, add it to our list of valid times. 
+          int start = TimeRange.START_OF_DAY;
+          for (TimeRange time: mergedTimes){
+              int end = time.start();
+              TimeRange newRange = TimeRange.fromStartEnd(start, end, false);
+              if (duration <= newRange.duration()){
+                  finalTimes.add(newRange);
+              }
+              start = time.end();
+          }
+          int end = TimeRange.END_OF_DAY;
+          TimeRange newRange = TimeRange.fromStartEnd(start, end, true);
+          if (duration <= newRange.duration()){
+              finalTimes.add(newRange);
+          }
+      }
+      return finalTimes;
   }
 }
